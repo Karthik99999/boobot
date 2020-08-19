@@ -1,0 +1,4 @@
+.env
+boobot.exe
+credentials.json
+db/
