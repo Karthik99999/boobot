@@ -28,7 +28,8 @@ func GetSettings(guildID string) GuildSettings {
 	// Open the database
 	db, err := leveldb.OpenFile("db/settings", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return GuildSettings{}
 	}
 	defer db.Close()
 
@@ -86,7 +87,8 @@ func (gs *GuildSettings) Set(key, value string) bool {
 	// Open the database
 	db, err := leveldb.OpenFile("db/settings", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return false
 	}
 	defer db.Close()
 
@@ -106,7 +108,8 @@ func (gs *GuildSettings) Reset(key string) bool {
 	// Open the database
 	db, err := leveldb.OpenFile("db/settings", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return false
 	}
 	defer db.Close()
 

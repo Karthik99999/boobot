@@ -31,7 +31,8 @@ func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string
 	// Open the database
 	db, err := bolt.Open("db/fc.db", 0600, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer db.Close()
 
@@ -42,7 +43,8 @@ func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string
 		}
 		return nil
 	}); err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	if err := db.View(func(tx *bolt.Tx) error {
@@ -74,6 +76,7 @@ func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string
 		s.ChannelMessageSend(message.ChannelID, string(v))
 		return nil
 	}); err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 }

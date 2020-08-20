@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"boobot/structs"
+
 	"github.com/bwmarrin/discordgo"
 	bolt "go.etcd.io/bbolt"
 )
@@ -29,7 +30,8 @@ func runRemFC(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 	// Open the database
 	db, err := bolt.Open("db/fc.db", 0600, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer db.Close()
 
@@ -40,7 +42,8 @@ func runRemFC(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		}
 		return nil
 	}); err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	if err := db.Update(func(tx *bolt.Tx) error {
@@ -49,6 +52,7 @@ func runRemFC(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		s.ChannelMessageSend(message.ChannelID, "Your FC has been deleted.")
 		return err
 	}); err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 }
