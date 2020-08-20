@@ -54,8 +54,15 @@ func main() {
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	guildCount := fmt.Sprintf("on %d servers", len(s.State.Guilds))
-	s.UpdateStatus(0, guildCount)
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	usd := discordgo.UpdateStatusData{
+		Game: &discordgo.Game{
+			Name: "boo.bot.nu | " + guildCount,
+			Type: discordgo.GameTypeWatching,
+		},
+		Status: "dnd",
+	}
+	s.UpdateStatusComplex(usd)
 	fmt.Println("logged in as user " + s.State.User.String())
 }
 

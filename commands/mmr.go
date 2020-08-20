@@ -43,7 +43,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		tr = strings.ToLower(args[0])
 	}
 	// mkblounge
-	if message.GuildID == "387347467332485122" /* || message.GuildID == "513093856338640916"*/ {
+	if message.GuildID == "387347467332485122" || message.GuildID == "513093856338640916" {
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
