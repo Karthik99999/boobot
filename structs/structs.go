@@ -43,7 +43,7 @@ func GetSettings(guildID string) GuildSettings {
 func (gs *GuildSettings) Default(guildID string) {
 	gs.guildID = guildID
 	if gs.Prefix == "" {
-		gs.Prefix = "$"
+		gs.Prefix = "^"
 	}
 	if gs.DisableChoose == "" {
 		gs.DisableChoose = "false"
