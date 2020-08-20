@@ -38,7 +38,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		tr = strings.ToLower(args[0])
 	}
 	// mkblounge
-	if message.GuildID == "387347467332485122" || message.GuildID == "513093856338640916" {
+	if message.GuildID == "387347467332485122" /* || message.GuildID == "513093856338640916"*/ {
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
@@ -142,6 +142,8 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			s.ChannelMessageSend(message.ChannelID, errMsg)
 			return
 		}
+		rows := leaderboard.Rows
+		leaderboard = nil
 		// Convert indexes from settings to ints
 		reg := regexp.MustCompile(`\s`)
 		playerIndex, _ := strconv.Atoi(settings.PlayerIndex)
@@ -152,7 +154,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
 				return
 			}
-			if playerIndex >= len(leaderboard.Rows[0]) || i >= len(leaderboard.Rows[0]) {
+			if playerIndex >= len(rows[0]) || i >= len(rows[0]) {
 				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
 				return
 			}
@@ -167,7 +169,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			embed.Fields = append(embed.Fields, field)
 		}
 		// Loop over leaderboard rows
-		for _, row := range leaderboard.Rows {
+		for _, row := range rows {
 			// Find player. Use the nickname if no name was specified
 			if (settings.Spreadsheet2 == "" && len(args) > 0) || (settings.Spreadsheet2 != "" && len(args) > 1) {
 				if strings.ToLower(row[playerIndex].Value) == strings.ToLower(player) {
@@ -176,7 +178,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 					for _, index := range statIndexes {
 						i, _ := strconv.Atoi(index)
 						if i != playerIndex {
-							addStatField(leaderboard.Rows[0][i].Value, row[i].Value)
+							addStatField(rows[0][i].Value, row[i].Value)
 						}
 					}
 				}
@@ -185,7 +187,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 					embed.Description = row[playerIndex].Value
 					for _, index := range statIndexes {
 						i, _ := strconv.Atoi(index)
-						addStatField(leaderboard.Rows[0][i].Value, row[i].Value)
+						addStatField(rows[0][i].Value, row[i].Value)
 					}
 				}
 			}
