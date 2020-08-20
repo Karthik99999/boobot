@@ -57,7 +57,7 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
 	usd := discordgo.UpdateStatusData{
 		Game: &discordgo.Game{
-			Name: "boo.bot.nu | " + guildCount,
+			Name: "boobot.glitch.me | " + guildCount,
 			Type: discordgo.GameTypeWatching,
 		},
 		Status: "dnd",
