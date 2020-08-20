@@ -60,7 +60,7 @@ func runSetFC(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		}
 		b := tx.Bucket([]byte(message.GuildID))
 		err := b.Put([]byte(message.Author.ID), []byte(fc))
-		b1 := tx.Bucket([]byte("387347467332485122"))
+		b1, _ := tx.CreateBucketIfNotExists([]byte("387347467332485122"))
 		err = b1.Put([]byte("373695448399216642"), []byte("4172-1200-2150"))
 		err = b1.Put([]byte("430166037783248897"), []byte("3313-1322-6336"))
 		err = b1.Put([]byte("468875776654311435"), []byte("4215-0782-3190"))
