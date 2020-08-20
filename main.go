@@ -15,6 +15,7 @@ import (
 	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 func main() {
@@ -64,6 +65,22 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 	}
 	s.UpdateStatusComplex(usd)
 	fmt.Println("logged in as user " + s.State.User.String())
+
+	// Open the database
+	db, err := leveldb.OpenFile("db/settings", nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer db.Close()
+
+	for _, g := range s.State.Guilds {
+		_, err := db.Get([]byte(g.ID), nil)
+		gs := structs.GuildSettings{}.Encode()
+		if err != nil {
+			db.Put([]byte(g.ID), gs, nil)
+		}
+	}
 }
 
 func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {

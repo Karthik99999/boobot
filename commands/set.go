@@ -85,7 +85,7 @@ func runSet(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		}
 		msg += fmt.Sprintf("\n%sset edit <SettingName> <Value> to change a setting.", settings.Prefix)
 		msg += fmt.Sprintf("\n%sset reset <SettingName> to reset a setting to it's default (blank if it doesn't have one).", settings.Prefix)
-		msg += "\nGo to boo.bot.nu for more info on how to setup these guild settings."
+		msg += "\nGo to boobot.glitch.me for more info on how to setup these guild settings."
 		msg += "```"
 		s.ChannelMessageSend(message.ChannelID, msg)
 	}
