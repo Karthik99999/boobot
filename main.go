@@ -37,6 +37,8 @@ func main() {
 
 	// register events
 	bot.AddHandler(ready)
+	bot.AddHandler(guildCreate)
+	bot.AddHandler(guildDelete)
 	bot.AddHandler(messageCreate)
 
 	err = bot.Open()
@@ -66,9 +68,37 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 	fmt.Println("logged in as user " + s.State.User.String())
 }
 
+func guildCreate(s *discordgo.Session, guild *discordgo.GuildCreate) {
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	usd := discordgo.UpdateStatusData{
+		Game: &discordgo.Game{
+			Name: "boobot.glitch.me | " + guildCount,
+			Type: discordgo.GameTypeWatching,
+		},
+		Status: "dnd",
+	}
+	s.UpdateStatusComplex(usd)
+}
+
+func guildDelete(s *discordgo.Session, guild *discordgo.GuildDelete) {
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	usd := discordgo.UpdateStatusData{
+		Game: &discordgo.Game{
+			Name: "boobot.glitch.me | " + guildCount,
+			Type: discordgo.GameTypeWatching,
+		},
+		Status: "dnd",
+	}
+	s.UpdateStatusComplex(usd)
+}
+
 func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 	// Don't reply to bots
 	if message.Author.Bot {
+		return
+	}
+	// Temp | Disable for mk8dx 150cc and mkwii lounge
+	if message.GuildID == "445404006177570829" || message.GuildID == "387347467332485122" {
 		return
 	}
 
