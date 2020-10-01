@@ -117,6 +117,8 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 	for _, c := range commands.Commands {
 		if command == c.Name || utils.Contains(c.Aliases, command) {
 			c.Run(s, message, args, guildSettings)
+			guild, _ := s.Guild(message.GuildID)
+			fmt.Printf("%s (%s) used %s command in %s (%s)\n", message.Author.Username, message.Author.ID, command, guild.Name, message.GuildID)
 			break
 		}
 	}
