@@ -13,7 +13,6 @@ import (
 	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
-	"gopkg.in/Iwark/spreadsheet.v2"
 )
 
 // Add command to list of commands
@@ -117,7 +116,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			tr = strings.ToLower(args[0])
 		}
 		var player string
-		var leaderboard *spreadsheet.Sheet = nil
+		var leaderboard [][]interface{}
 		var errMsg string
 		if settings.Spreadsheet2 != "" {
 			if len(args) > 1 {
@@ -142,8 +141,6 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			s.ChannelMessageSend(message.ChannelID, errMsg)
 			return
 		}
-		rows := leaderboard.Rows
-		leaderboard = nil
 		// Convert indexes from settings to ints
 		reg := regexp.MustCompile(`\s`)
 		playerIndex, _ := strconv.Atoi(settings.PlayerIndex)
@@ -154,7 +151,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
 				return
 			}
-			if playerIndex >= len(rows[0]) || i >= len(rows[0]) {
+			if playerIndex >= len(leaderboard[0]) || i >= len(leaderboard[0]) {
 				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
 				return
 			}
@@ -169,25 +166,25 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			embed.Fields = append(embed.Fields, field)
 		}
 		// Loop over leaderboard rows
-		for _, row := range rows {
+		for _, row := range leaderboard {
 			// Find player. Use the nickname if no name was specified
 			if (settings.Spreadsheet2 == "" && len(args) > 0) || (settings.Spreadsheet2 != "" && len(args) > 1) {
-				if strings.ToLower(row[playerIndex].Value) == strings.ToLower(player) {
-					embed.Description = row[playerIndex].Value
+				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(player) {
+					embed.Description = row[playerIndex].(string)
 					// add field for each stat column specificed in guild settings
 					for _, index := range statIndexes {
 						i, _ := strconv.Atoi(index)
 						if i != playerIndex {
-							addStatField(rows[0][i].Value, row[i].Value)
+							addStatField(leaderboard[0][i].(string), row[i].(string))
 						}
 					}
 				}
 			} else {
-				if strings.ToLower(row[playerIndex].Value) == strings.ToLower(message.Member.Nick) {
-					embed.Description = row[playerIndex].Value
+				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) {
+					embed.Description = row[playerIndex].(string)
 					for _, index := range statIndexes {
 						i, _ := strconv.Atoi(index)
-						addStatField(rows[0][i].Value, row[i].Value)
+						addStatField(leaderboard[0][i].(string), row[i].(string))
 					}
 				}
 			}

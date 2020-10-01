@@ -9,7 +9,6 @@ import (
 	"boobot/structs"
 
 	"github.com/bwmarrin/discordgo"
-	"gopkg.in/Iwark/spreadsheet.v2"
 )
 
 // Add command to list of commands
@@ -43,7 +42,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		tr = strings.ToLower(args[0])
 	}
 	// mkblounge
-	if message.GuildID == "387347467332485122" || message.GuildID == "513093856338640916" {
+	if message.GuildID == "387347467332485122" /* || message.GuildID == "513093856338640916"*/ {
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
@@ -107,7 +106,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		if len(args) > 0 {
 			tr = strings.ToLower(args[0])
 		}
-		var leaderboard *spreadsheet.Sheet = nil
+		var leaderboard [][]interface{}
 		var errMsg string
 		if settings.Spreadsheet2 != "" {
 			if tr == "rt" {
@@ -137,29 +136,29 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 			s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and rating columns are correct in the guild settings using the `set` command.")
 			return
 		}
-		if playerIndex >= len(leaderboard.Rows[0]) || ratingIndex >= len(leaderboard.Rows[0]) {
+		if playerIndex >= len(leaderboard[0]) || ratingIndex >= len(leaderboard[0]) {
 			s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and rating columns are correct in the guild settings using the `set` command.")
 			return
 		}
 		// Loop over leaderboard rows
-		for _, row := range leaderboard.Rows {
+		for _, row := range leaderboard {
 			// Find player. Use the nickname if no name was specified
 			if (settings.Spreadsheet2 == "" && len(args) > 0) || (settings.Spreadsheet2 != "" && len(args) > 1) {
 				for _, player := range cArgs {
-					if strings.ToLower(row[playerIndex].Value) == strings.ToLower(player) {
+					if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(player) {
 						field := &discordgo.MessageEmbedField{
-							Name:   row[playerIndex].Value,
-							Value:  row[ratingIndex].Value,
+							Name:   row[playerIndex].(string),
+							Value:  row[ratingIndex].(string),
 							Inline: true,
 						}
 						embed.Fields = append(embed.Fields, field)
 					}
 				}
 			} else {
-				if strings.ToLower(row[playerIndex].Value) == strings.ToLower(message.Member.Nick) {
+				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) {
 					field := &discordgo.MessageEmbedField{
-						Name:   row[playerIndex].Value,
-						Value:  row[ratingIndex].Value,
+						Name:   row[playerIndex].(string),
+						Value:  row[ratingIndex].(string),
 						Inline: true,
 					}
 					embed.Fields = append(embed.Fields, field)
