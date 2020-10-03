@@ -14,6 +14,8 @@ type GuildSettings struct {
 	guildID       string
 	Prefix        string
 	DisableChoose string
+	GameBoards1   string
+	GameBoards2   string
 	Spreadsheet1  string
 	Spreadsheet2  string
 	SheetName     string
@@ -153,4 +155,42 @@ type Player struct {
 	Percentile      float64 `json:"percentile"`
 	UpdateDate      string  `json:"update_date"`
 	URL             string  `json:"url"`
+}
+
+type HlorenziBoard struct {
+	Data struct {
+		Team struct {
+			Kind        string     `json:"kind"`
+			Name        string     `json:"name"`
+			Tiers       []HlTiers  `json:"tiers"`
+			PlayerCount int        `json:"playerCount"`
+			Players     []HlPlayer `json:"players"`
+		} `json:"team"`
+	} `json:"data"`
+}
+
+type HlTiers struct {
+	Name       string `json:"name"`
+	LowerBound int    `json:"lowerBound"`
+	Color      string `json:"color"`
+}
+
+type HlPlayer struct {
+	Name              string  `json:"name"`
+	Ranking           int     `json:"ranking"`
+	MaxRanking        int     `json:"maxRanking"`
+	MinRanking        int     `json:"minRanking"`
+	Wins              int     `json:"wins"`
+	Losses            int     `json:"losses"`
+	PlayedMatchCount  int     `json:"playedMatchCount"`
+	FirstActivityDate int64   `json:"firstActivityDate"`
+	LastActivityDate  int64   `json:"lastActivityDate"`
+	Rating            float64 `json:"rating"`
+	RatingGain        int     `json:"ratingGain"`
+	MaxRating         float64 `json:"maxRating"`
+	MinRating         float64 `json:"minRating"`
+	MaxRatingGain     int     `json:"maxRatingGain"`
+	MaxRatingLoss     int     `json:"maxRatingLoss"`
+	Points            int     `json:"points"`
+	MaxPointsGain     int     `json:"maxPointsGain"`
 }
