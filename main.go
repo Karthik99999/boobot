@@ -111,6 +111,9 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	args := strings.Fields(strings.TrimPrefix(message.Content, prefix))
+	if len(args) <= 0 {
+		return
+	}
 	command := strings.ToLower(args[0])
 	args = args[1:]
 
