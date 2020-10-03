@@ -225,6 +225,9 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		}
 		// Loop over leaderboard rows
 		for _, row := range leaderboard {
+			if len(row) <= playerIndex || len(row) <= ratingIndex {
+				continue
+			}
 			// Find player. Use the nickname if no name was specified
 			if (settings.Spreadsheet2 == "" && len(args) > 0) || (settings.Spreadsheet2 != "" && len(args) > 1) {
 				for _, player := range cArgs {

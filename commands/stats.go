@@ -271,6 +271,9 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		}
 		// Loop over leaderboard rows
 		for _, row := range leaderboard {
+			if len(row) <= playerIndex {
+				continue
+			}
 			// Find player. Use the nickname if no name was specified
 			if (settings.Spreadsheet2 == "" && len(args) > 0) || (settings.Spreadsheet2 != "" && len(args) > 1) {
 				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(player) {
@@ -282,6 +285,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 							addStatField(leaderboard[0][i].(string), row[i].(string))
 						}
 					}
+					//break
 				}
 			} else {
 				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) {
@@ -290,6 +294,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 						i, _ := strconv.Atoi(index)
 						addStatField(leaderboard[0][i].(string), row[i].(string))
 					}
+					//break
 				}
 			}
 		}
