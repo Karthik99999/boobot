@@ -62,6 +62,7 @@ func GetHlData(id string) (*structs.HlorenziBoard, string) {
 	}
 	var board *structs.HlorenziBoard
 	_ = json.Unmarshal(body, &board)
+	board.Data.Team.Url = "https://gb.hlorenzi.com/reg/" + id
 
 	return board, ""
 }

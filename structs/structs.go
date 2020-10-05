@@ -160,6 +160,7 @@ type Player struct {
 type HlorenziBoard struct {
 	Data struct {
 		Team struct {
+			Url         string
 			Kind        string     `json:"kind"`
 			Name        string     `json:"name"`
 			Tiers       []HlTiers  `json:"tiers"`
