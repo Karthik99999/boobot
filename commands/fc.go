@@ -52,8 +52,10 @@ func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string
 		if len(args) > 0 {
 			guild, _ := s.Guild(message.GuildID)
 			for _, m := range guild.Members {
-				if strings.ToLower(m.Nick) == strings.ToLower(strings.Join(args, " ")) {
+				if strings.ToLower(m.Nick) == strings.ToLower(strings.Join(args, " ")) || strings.ToLower(m.User.Username) == strings.ToLower(strings.Join(args, " ")) {
 					user = m.User
+				} else if len(message.Mentions) > 0 {
+					user = message.Mentions[0]
 				}
 			}
 		} else {

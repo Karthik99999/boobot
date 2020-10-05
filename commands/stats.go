@@ -37,11 +37,15 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		tr = strings.ToLower(args[0])
 	}
 	// mkblounge
-	if message.GuildID == "387347467332485122" /* || message.GuildID == "513093856338640916"*/ {
+	if message.GuildID == "387347467332485122" || message.GuildID == "760967457350746113" /* || message.GuildID == "513093856338640916"*/ {
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
-				players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				if message.Member.Nick == "" {
+					players = mmr.GetPlayers(tr, []string{message.Author.Username})
+				} else {
+					players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				}
 			} else {
 				players = mmr.GetPlayers(tr, []string{strings.Join(args, " ")[3:]})
 			}
@@ -150,7 +154,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 					hlPlayer = players
 				}
 			} else {
-				if strings.ToLower(players.Name) == strings.ToLower(message.Member.Nick) {
+				if strings.ToLower(players.Name) == strings.ToLower(message.Member.Nick) || strings.ToLower(players.Name) == strings.ToLower(message.Author.Username) {
 					hlPlayer = players
 				}
 			}
@@ -181,23 +185,23 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		embedColor := strconv.FormatInt(tierColor, 10)
 		embed.Color, _ = strconv.Atoi(embedColor)
 		embed.Description = hlPlayer.Name
-		addStatField("Rank", "#"+strconv.Itoa(hlPlayer.Ranking+1))
-		addStatField("Tier", getTier(math.Floor(hlPlayer.Rating)).Name)
-		addStatField("Matches", strconv.Itoa(hlPlayer.PlayedMatchCount))
-		addStatField("Rating", strconv.Itoa(int(math.Floor(hlPlayer.Rating))))
-		addStatField("Max Rating", strconv.Itoa(int(math.Floor(hlPlayer.MaxRating))))
-		addStatField("Min Rating", strconv.Itoa(int(math.Floor(hlPlayer.MinRating))))
-		addStatField("Wins", strconv.Itoa(hlPlayer.Wins))
-		addStatField("Losses", strconv.Itoa(hlPlayer.Losses))
-		addStatField("Win Ratio", fmt.Sprintf("%.1f%%", (float64(hlPlayer.Wins)/float64(hlPlayer.PlayedMatchCount))*100))
-		addStatField("Max Rating Gain", fmt.Sprintf("%+d", hlPlayer.MaxRatingGain))
-		addStatField("Max Rating Loss", strconv.Itoa(hlPlayer.MaxRatingLoss))
-		addStatField("Max Points", strconv.Itoa(hlPlayer.MaxPointsGain))
-		addStatField("Avg Points", fmt.Sprintf("%.1f", (float64(hlPlayer.Points)/float64(hlPlayer.PlayedMatchCount))))
-		addStatField("Best Rank", "#"+strconv.Itoa(hlPlayer.MinRanking+1))
-		addStatField("Worst Rank", "#"+strconv.Itoa(hlPlayer.MaxRanking+1))
-		// Let the user know if the player wasn't found.
-		if embed.Description == "" {
+		if embed.Description != "" {
+			addStatField("Rank", "#"+strconv.Itoa(hlPlayer.Ranking+1))
+			addStatField("Tier", getTier(math.Floor(hlPlayer.Rating)).Name)
+			addStatField("Matches", strconv.Itoa(hlPlayer.PlayedMatchCount))
+			addStatField("Rating", strconv.Itoa(int(math.Floor(hlPlayer.Rating))))
+			addStatField("Max Rating", strconv.Itoa(int(math.Floor(hlPlayer.MaxRating))))
+			addStatField("Min Rating", strconv.Itoa(int(math.Floor(hlPlayer.MinRating))))
+			addStatField("Wins", strconv.Itoa(hlPlayer.Wins))
+			addStatField("Losses", strconv.Itoa(hlPlayer.Losses))
+			addStatField("Win Ratio", fmt.Sprintf("%.1f%%", (float64(hlPlayer.Wins)/float64(hlPlayer.PlayedMatchCount))*100))
+			addStatField("Max Rating Gain", fmt.Sprintf("%+d", hlPlayer.MaxRatingGain))
+			addStatField("Max Rating Loss", strconv.Itoa(hlPlayer.MaxRatingLoss))
+			addStatField("Max Points", strconv.Itoa(hlPlayer.MaxPointsGain))
+			addStatField("Avg Points", fmt.Sprintf("%.1f", (float64(hlPlayer.Points)/float64(hlPlayer.PlayedMatchCount))))
+			addStatField("Best Rank", "#"+strconv.Itoa(hlPlayer.MinRanking+1))
+			addStatField("Worst Rank", "#"+strconv.Itoa(hlPlayer.MaxRanking+1))
+		} else {
 			embed.Footer = &discordgo.MessageEmbedFooter{
 				Text: "The specified player wasn't found. Check your input for errors.",
 			}
@@ -285,16 +289,16 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 							addStatField(leaderboard[0][i].(string), row[i].(string))
 						}
 					}
-					//break
+					break
 				}
 			} else {
-				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) {
+				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) || strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Author.Username) {
 					embed.Description = row[playerIndex].(string)
 					for _, index := range statIndexes {
 						i, _ := strconv.Atoi(index)
 						addStatField(leaderboard[0][i].(string), row[i].(string))
 					}
-					//break
+					break
 				}
 			}
 		}

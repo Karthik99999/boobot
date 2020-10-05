@@ -43,11 +43,15 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 		tr = strings.ToLower(args[0])
 	}
 	// mkblounge
-	if message.GuildID == "387347467332485122" /* || message.GuildID == "513093856338640916"*/ {
+	if message.GuildID == "387347467332485122" || message.GuildID == "760967457350746113" /* || message.GuildID == "513093856338640916"*/ {
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
-				players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				if message.Member.Nick == "" {
+					players = mmr.GetPlayers(tr, []string{message.Author.Username})
+				} else {
+					players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				}
 			} else {
 				players = mmr.GetPlayers(tr, cArgs)
 			}
@@ -141,7 +145,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 					}
 				}
 			} else {
-				if strings.ToLower(hlPlayer.Name) == strings.ToLower(message.Member.Nick) {
+				if strings.ToLower(hlPlayer.Name) == strings.ToLower(message.Member.Nick) || strings.ToLower(hlPlayer.Name) == strings.ToLower(message.Author.Username) {
 					field := &discordgo.MessageEmbedField{
 						Name:   hlPlayer.Name,
 						Value:  strconv.Itoa(int(math.Floor(hlPlayer.Rating))),
@@ -241,7 +245,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 					}
 				}
 			} else {
-				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) {
+				if strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Member.Nick) || strings.ToLower(row[playerIndex].(string)) == strings.ToLower(message.Author.Username) {
 					field := &discordgo.MessageEmbedField{
 						Name:   row[playerIndex].(string),
 						Value:  row[ratingIndex].(string),

@@ -38,7 +38,11 @@ func runStrikes(s *discordgo.Session, message *discordgo.MessageCreate, args []s
 		if tr == "rt" || tr == "ct" {
 			var players []*structs.Player
 			if len(args) < 2 {
-				players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				if message.Member.Nick == "" {
+					players = mmr.GetPlayers(tr, []string{message.Author.Username})
+				} else {
+					players = mmr.GetPlayers(tr, []string{message.Member.Nick})
+				}
 			} else {
 				players = mmr.GetPlayers(tr, []string{strings.Join(args, " ")[3:]})
 			}
