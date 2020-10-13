@@ -98,7 +98,7 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 	// Temp | Disable for mk8dx 150cc and mkwii lounge
-	if message.GuildID == "445404006177570829" || message.GuildID == "387347467332485122" {
+	if message.GuildID == "387347467332485122" {
 		return
 	}
 
