@@ -97,10 +97,6 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 	if message.Author.Bot {
 		return
 	}
-	// Temp | Disable for mk8dx 150cc and mkwii lounge
-	if message.GuildID == "387347467332485122" {
-		return
-	}
 
 	guildSettings := structs.GetSettings(message.GuildID)
 	prefix := guildSettings.Prefix
