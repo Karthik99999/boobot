@@ -30,6 +30,9 @@ func MMR() Command {
 
 // Function to run when command is used
 func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	if strings.ToLower(settings.DisableMMR) == "true" {
+		return
+	}
 	// get player names seperated by commas
 	cArgs := strings.Split(strings.Join(args, " "), ",")
 	for i, p := range cArgs {

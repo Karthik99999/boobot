@@ -32,6 +32,9 @@ func Stats() Command {
 
 // Function to run when command is used
 func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	if strings.ToLower(settings.DisableMMR) == "true" {
+		return
+	}
 	var tr string
 	if len(args) > 0 {
 		tr = strings.ToLower(args[0])

@@ -14,6 +14,7 @@ type GuildSettings struct {
 	guildID       string
 	Prefix        string
 	DisableChoose string
+	DisableMMR    string
 	GameBoards1   string
 	GameBoards2   string
 	Spreadsheet1  string
@@ -49,6 +50,9 @@ func (gs *GuildSettings) Default(guildID string) {
 	}
 	if gs.DisableChoose == "" {
 		gs.DisableChoose = "false"
+	}
+	if gs.DisableMMR == "" {
+		gs.DisableMMR = "false"
 	}
 	if gs.SheetName == "" {
 		gs.SheetName = "Leaderboard"
