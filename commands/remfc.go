@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"boobot/structs"
 
@@ -27,6 +28,9 @@ func RemFC() Command {
 
 // Function to run when command is used
 func runRemFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	if strings.ToLower(settings.DisableFC) == "true" {
+		return
+	}
 	// Open the database
 	db, err := bolt.Open("db/fc.db", 0600, nil)
 	if err != nil {

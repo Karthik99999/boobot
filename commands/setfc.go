@@ -31,6 +31,9 @@ func SetFC() Command {
 
 // Function to run when command is used
 func runSetFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	if strings.ToLower(settings.DisableFC) == "true" {
+		return
+	}
 	// Open the database
 	db, err := bolt.Open("db/fc.db", 0600, nil)
 	if err != nil {
