@@ -41,6 +41,8 @@ func main() {
 	bot.AddHandler(guildDelete)
 	bot.AddHandler(messageCreate)
 
+	bot.Identify.Intents = nil
+
 	err = bot.Open()
 
 	if err != nil {

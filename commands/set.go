@@ -29,7 +29,7 @@ func Set() Command {
 // Function to run when command is used
 func runSet(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
 	p, _ := s.State.UserChannelPermissions(message.Author.ID, message.ChannelID)
-	if p&discordgo.PermissionManageServer != discordgo.PermissionManageServer && message.Author.ID != "397514708736802816" {
+	if p&discordgo.PermissionManageServer != discordgo.PermissionManageServer && p&discordgo.PermissionAdministrator != discordgo.PermissionAdministrator && message.Author.ID != "397514708736802816" {
 		s.ChannelMessageSend(message.ChannelID, "You don't have the permission to use this command.")
 		return
 	}
