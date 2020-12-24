@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"boobot/structs"
+	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -28,8 +29,8 @@ func Set() Command {
 
 // Function to run when command is used
 func runSet(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	p, _ := s.State.UserChannelPermissions(message.Author.ID, message.ChannelID)
-	if p&discordgo.PermissionAdministrator != discordgo.PermissionAdministrator && message.Author.ID != "397514708736802816" {
+	hasPerm, _ := utils.MemberHasPermission(s, message.GuildID, message.Author.ID, discordgo.PermissionAdministrator)
+	if !hasPerm {
 		s.ChannelMessageSend(message.ChannelID, "You don't have the permission to use this command.")
 		return
 	}
