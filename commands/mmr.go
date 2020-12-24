@@ -33,64 +33,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}
-	// get player names seperated by commas
-	cArgs := strings.Split(strings.Join(args, " "), ",")
-	for i, p := range cArgs {
-		cArgs[i] = strings.TrimSpace(p)
-	}
-	if len(cArgs[0]) > 3 {
-		cArgs[0] = cArgs[0][3:]
-	}
-	var tr string
-	if len(args) > 0 {
-		tr = strings.ToLower(args[0])
-	}
-	// mkblounge
-	if message.GuildID == "387347467332485122" || message.GuildID == "760967457350746113" /* || message.GuildID == "513093856338640916"*/ {
-		if tr == "rt" || tr == "ct" {
-			var players []*structs.Player
-			if len(args) < 2 {
-				if message.Member.Nick == "" {
-					players = mmr.GetPlayers(tr, []string{message.Author.Username})
-				} else {
-					players = mmr.GetPlayers(tr, []string{message.Member.Nick})
-				}
-			} else {
-				players = mmr.GetPlayers(tr, cArgs)
-			}
-			guild, _ := s.Guild(message.GuildID)
-			var embed *discordgo.MessageEmbed = new(discordgo.MessageEmbed)
-			embed.Author = &discordgo.MessageEmbedAuthor{
-				Name:    "MMR",
-				IconURL: guild.IconURL(),
-			}
-			// Add each player as a field
-			for _, p := range players {
-				field := &discordgo.MessageEmbedField{
-					Name:   p.Name,
-					Value:  fmt.Sprintf("[%s](%s)", strconv.Itoa(p.CurrentMmr), p.URL),
-					Inline: true,
-				}
-				embed.Fields = append(embed.Fields, field)
-			}
-			// Let the user know how many players weren't found
-			missingPlayers := len(cArgs) - len(players)
-			if missingPlayers > 0 {
-				if missingPlayers == 1 {
-					embed.Footer = &discordgo.MessageEmbedFooter{
-						Text: "A player wasn't found. Check your input for errors.",
-					}
-				} else {
-					embed.Footer = &discordgo.MessageEmbedFooter{
-						Text: fmt.Sprintf("%d players weren't found. Check your input for errors.", missingPlayers),
-					}
-				}
-			}
-			s.ChannelMessageSendEmbed(message.ChannelID, embed)
-		} else {
-			s.ChannelMessageSend(message.ChannelID, "Please specify the leaderboard you would like to check.")
-		}
-	} else if settings.GameBoards1 != "" {
+	if settings.GameBoards1 != "" {
 		// create embed
 		guild, _ := s.Guild(message.GuildID)
 		var embed *discordgo.MessageEmbed = new(discordgo.MessageEmbed)

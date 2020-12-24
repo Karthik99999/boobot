@@ -6,11 +6,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"boobot/mmr"
 	"boobot/structs"
-	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -35,78 +33,7 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}
-	var tr string
-	if len(args) > 0 {
-		tr = strings.ToLower(args[0])
-	}
-	// mkblounge
-	if message.GuildID == "387347467332485122" || message.GuildID == "760967457350746113" /* || message.GuildID == "513093856338640916"*/ {
-		if tr == "rt" || tr == "ct" {
-			var players []*structs.Player
-			if len(args) < 2 {
-				if message.Member.Nick == "" {
-					players = mmr.GetPlayers(tr, []string{message.Author.Username})
-				} else {
-					players = mmr.GetPlayers(tr, []string{message.Member.Nick})
-				}
-			} else {
-				players = mmr.GetPlayers(tr, []string{strings.Join(args, " ")[3:]})
-			}
-			// Create embed
-			guild, _ := s.Guild(message.GuildID)
-			var embed *discordgo.MessageEmbed = new(discordgo.MessageEmbed)
-			embed.Author = &discordgo.MessageEmbedAuthor{
-				Name:    "Stats",
-				IconURL: guild.IconURL(),
-			}
-			// Stop if the player wasn't found
-			if len(players) == 0 {
-				embed.Footer = &discordgo.MessageEmbedFooter{
-					Text: "The specified player wasn't found. Check your input for errors.",
-				}
-				s.ChannelMessageSendEmbed(message.ChannelID, embed)
-				return
-			}
-			player := players[0]
-			embed.Description = fmt.Sprintf("[%s](%s)", player.Name, player.URL)
-			// Add each stat as a field
-			addStatField := func(statName, statValue string) {
-				field := &discordgo.MessageEmbedField{
-					Name:   statName,
-					Value:  statValue,
-					Inline: true,
-				}
-				embed.Fields = append(embed.Fields, field)
-			}
-			// Add stats as fields
-			addStatField("Rank", player.Ranking)
-			addStatField("Percentile", utils.Ternary(player.TotalWars == 0, "-", utils.Nth(int(math.Floor(player.Percentile)))).(string))
-			addStatField("MMR", strconv.Itoa(player.CurrentMmr))
-			addStatField("Peak MMR", fmt.Sprintf("%v", utils.Ternary(player.TotalWars <= 10, "-", player.PeakMmr)))
-			addStatField("Lowest MMR", fmt.Sprintf("%v", utils.Ternary(player.TotalWars <= 10, "-", player.LowestMmr)))
-			addStatField("Events", strconv.Itoa(player.TotalWars))
-			addStatField("Win %", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", math.Round(player.WinPercentage*100))))
-			addStatField("W-L", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%d-%d", player.Wins, player.Loss))))
-			addStatField("W-L (Last 10)", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%d-%d", player.Wins10, player.Loss10))))
-			addStatField("Gain/Loss (Last 10)", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%+d", player.Gainloss10Mmr))))
-			addStatField("Max MMR Gain", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%+d", player.MaxGainMmr))))
-			addStatField("Max MMR Loss", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", player.MaxLossMmr)))
-			addStatField("Avg. Score", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%.1f", player.AverageScore))))
-			addStatField("Avg. Score (Last 10)", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%.1f", player.Average10Score))))
-			addStatField("Std. Dev", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%.1f", player.StdScore))))
-			addStatField("Std. Dev (Last 10)", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", fmt.Sprintf("%.1f", player.Std10Score))))
-			addStatField("Top Score", fmt.Sprintf("%v", utils.Ternary(player.TotalWars == 0, "-", player.TopScore)))
-			// Add last updated date as footer
-			date, _ := time.Parse("2006-01-02 15:04:05", player.UpdateDate)
-			date = date.Add(-2 * time.Hour)
-			embed.Footer = &discordgo.MessageEmbedFooter{
-				Text: fmt.Sprintf("Last updated on %s", date.In(time.Local).Format("January 02, 2006 at 3:04 PM (EDT)")),
-			}
-			s.ChannelMessageSendEmbed(message.ChannelID, embed)
-		} else {
-			s.ChannelMessageSend(message.ChannelID, "Please specify the leaderboard you would like to check.")
-		}
-	} else if settings.GameBoards1 != "" {
+	if settings.GameBoards1 != "" {
 		// create embed
 		guild, _ := s.Guild(message.GuildID)
 		var embed *discordgo.MessageEmbed = new(discordgo.MessageEmbed)
