@@ -1,4 +1,5 @@
 .env
+boobot
 boobot.exe
 credentials.json
 db/
