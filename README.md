@@ -1,5 +1,7 @@
 # Running the bot
 
+This bot uses GO version 1.14.
+
 To run the bot, run the following commands
 
 ```bash
