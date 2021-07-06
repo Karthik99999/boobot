@@ -101,6 +101,12 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		// Find tier based on rating
 		getTier := func(rating float64) structs.HlTiers {
 			tiers := leaderboard.Data.Team.Tiers
+			if len(tiers) < 1 {
+				return structs.HlTiers{
+					Name:  "???",
+					Color: "#ffffff",
+				}
+			}
 			tierData := tiers[len(tiers)-1]
 			for i, tier := range tiers {
 				if tier.LowerBound > int(rating) {
