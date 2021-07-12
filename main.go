@@ -95,8 +95,8 @@ func guildDelete(s *discordgo.Session, guild *discordgo.GuildDelete) {
 }
 
 func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
-	// Don't reply to bots
-	if message.Author.Bot {
+	// Don't reply to bots or read DMs
+	if message.Author.Bot || message.GuildID == "" {
 		return
 	}
 
