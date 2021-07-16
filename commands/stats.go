@@ -110,7 +110,11 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 			tierData := tiers[len(tiers)-1]
 			for i, tier := range tiers {
 				if tier.LowerBound > int(rating) {
-					tierData = tiers[i-1]
+					if i == 0 {
+						tierData = tiers[i]
+					} else {
+						tierData = tiers[i-1]
+					}
 					break
 				}
 			}
