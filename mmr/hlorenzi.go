@@ -61,7 +61,11 @@ func GetHlData(id string) (*structs.HlorenziBoard, string) {
 		return nil, "An error occured during the request. Please try again in a moment."
 	}
 	var board *structs.HlorenziBoard
-	_ = json.Unmarshal(body, &board)
+	err = json.Unmarshal(body, &board)
+	if err != nil {
+		log.Println(err)
+		return nil, "An error occured during the request. Please try again in a moment."
+	}
 	board.Data.Team.Url = "https://gb.hlorenzi.com/reg/" + id
 
 	return board, ""
