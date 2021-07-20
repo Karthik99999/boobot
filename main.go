@@ -117,7 +117,7 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 
 	for _, c := range commands.Commands {
 		if command == c.Name || utils.Contains(c.Aliases, command) {
-			c.Run(s, message, args, guildSettings)
+			go c.Run(s, message, args, guildSettings)
 			guild, err := s.Guild(message.GuildID)
 			if err != nil {
 				fmt.Println(err)
