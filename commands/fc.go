@@ -28,6 +28,7 @@ func FC() Command {
 
 // Function to run when command is used
 func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	defer recoverPanic()
 	if strings.ToLower(settings.DisableFC) == "true" {
 		return
 	}

@@ -2,6 +2,8 @@ package commands
 
 import (
 	"boobot/structs"
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -15,3 +17,9 @@ type Command struct {
 
 // List of commands that will be added to on startup
 var Commands []Command
+
+func recoverPanic() {
+	if r := recover(); r != nil {
+		fmt.Println("RECOVERED PANIC:", r)
+	}
+}

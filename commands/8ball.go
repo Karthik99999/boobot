@@ -27,6 +27,7 @@ func _8ball() Command {
 
 // Function to run when command is used
 func run8ball(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	defer recoverPanic()
 	responses := []string{
 		"It is certain",
 		"It is decidedly so",

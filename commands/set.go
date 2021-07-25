@@ -29,6 +29,7 @@ func Set() Command {
 
 // Function to run when command is used
 func runSet(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	defer recoverPanic()
 	hasPerm, _ := utils.MemberHasPermission(s, message.GuildID, message.Author.ID, discordgo.PermissionAdministrator)
 	if !hasPerm {
 		s.ChannelMessageSend(message.ChannelID, "You don't have the permission to use this command.")

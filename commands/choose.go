@@ -27,6 +27,7 @@ func Choose() Command {
 
 // Function to run when command is used
 func runChoose(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
+	defer recoverPanic()
 	if strings.ToLower(settings.DisableChoose) == "true" {
 		return
 	}
