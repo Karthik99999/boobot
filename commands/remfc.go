@@ -11,24 +11,16 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := RemFC()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func RemFC() Command {
 	cmd := Command{}
 	cmd.Name = "remfc"
 	cmd.Run = runRemFC
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runRemFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	if strings.ToLower(settings.DisableFC) == "true" {
 		return
 	}

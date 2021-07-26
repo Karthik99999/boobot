@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"strings"
 
 	"boobot/structs"
@@ -10,24 +9,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := _8ball()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func _8ball() Command {
 	cmd := Command{}
 	cmd.Name = "8ball"
 	cmd.Run = run8ball
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func run8ball(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	responses := []string{
 		"It is certain",
 		"It is decidedly so",

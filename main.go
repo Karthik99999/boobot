@@ -12,7 +12,6 @@ import (
 
 	"boobot/commands"
 	"boobot/structs"
-	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -41,7 +40,7 @@ func main() {
 	bot.AddHandler(guildDelete)
 	bot.AddHandler(messageCreate)
 
-	bot.Identify.Intents = nil
+	bot.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged)
 
 	err = bot.Open()
 
@@ -115,16 +114,16 @@ func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
 	command := strings.ToLower(args[0])
 	args = args[1:]
 
-	for _, c := range commands.Commands {
-		if command == c.Name || utils.Contains(c.Aliases, command) {
-			go c.Run(s, message, args, guildSettings)
-			guild, err := s.Guild(message.GuildID)
-			if err != nil {
-				fmt.Println(err)
-				break
-			}
+	if alias, exists := commands.Aliases[command]; exists {
+		command = alias
+	}
+	if c, exists := commands.Commands[command]; exists {
+		go c.Run(s, message, args, guildSettings)
+		guild, err := s.Guild(message.GuildID)
+		if err != nil {
+			fmt.Println(err)
+		} else {
 			fmt.Printf("%s (%s) used %s command in %s (%s)\n", message.Author.Username, message.Author.ID, command, guild.Name, message.GuildID)
-			break
 		}
 	}
 }

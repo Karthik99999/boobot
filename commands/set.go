@@ -11,25 +11,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := Set()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func Set() Command {
 	cmd := Command{}
 	cmd.Name = "set"
 	cmd.Run = runSet
 	cmd.Aliases = []string{"setting"}
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runSet(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	hasPerm, _ := utils.MemberHasPermission(s, message.GuildID, message.Author.ID, discordgo.PermissionAdministrator)
 	if !hasPerm {
 		s.ChannelMessageSend(message.ChannelID, "You don't have the permission to use this command.")

@@ -11,24 +11,16 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := FC()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func FC() Command {
 	cmd := Command{}
 	cmd.Name = "fc"
 	cmd.Run = runFC
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	if strings.ToLower(settings.DisableFC) == "true" {
 		return
 	}
@@ -53,15 +45,8 @@ func runFC(s *discordgo.Session, message *discordgo.MessageCreate, args []string
 
 	if err := db.View(func(tx *bolt.Tx) error {
 		var user *discordgo.User
-		if len(args) > 0 {
-			guild, _ := s.Guild(message.GuildID)
-			for _, m := range guild.Members {
-				if strings.ToLower(m.Nick) == strings.ToLower(strings.Join(args, " ")) || strings.ToLower(m.User.Username) == strings.ToLower(strings.Join(args, " ")) {
-					user = m.User
-				} else if len(message.Mentions) > 0 {
-					user = message.Mentions[0]
-				}
-			}
+		if len(args) > 0 && len(message.Mentions) > 0 {
+			user = message.Mentions[0]
 		} else {
 			user = message.Author
 		}

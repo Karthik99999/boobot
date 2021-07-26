@@ -12,24 +12,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := Strikes()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func Strikes() Command {
 	cmd := Command{}
 	cmd.Name = "strikes"
 	cmd.Run = runStrikes
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runStrikes(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}

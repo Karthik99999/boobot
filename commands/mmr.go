@@ -12,25 +12,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := MMR()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func MMR() Command {
 	cmd := Command{}
 	cmd.Name = "mmr"
 	cmd.Aliases = []string{"elo"}
 	cmd.Run = runMMR
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}
@@ -43,12 +35,22 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 			IconURL: guild.IconURL(),
 		}
 		// get player names seperated by commas
-		cArgs := strings.Split(strings.Join(args, " "), ",")
-		for i, p := range cArgs {
-			cArgs[i] = strings.TrimSpace(p)
-		}
-		if settings.GameBoards2 != "" && len(cArgs[0]) > 3 {
-			cArgs[0] = cArgs[0][3:]
+		// if there were no additional names provided, use the user's display name
+		var cArgs []string
+		if len(args) == 0 || settings.GameBoards2 != "" && len(args) == 1 {
+			if message.Member.Nick != "" {
+				cArgs = []string{message.Member.Nick}
+			} else {
+				cArgs = []string{message.Author.Username}
+			}
+		} else {
+			cArgs = strings.Split(strings.Join(args, " "), ",")
+			for i, p := range cArgs {
+				cArgs[i] = strings.TrimSpace(p)
+			}
+			if settings.GameBoards2 != "" && len(cArgs[0]) > 3 {
+				cArgs[0] = cArgs[0][3:]
+			}
 		}
 		var tr string
 		if len(args) > 0 {
@@ -111,7 +113,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 				}
 			} else {
 				embed.Footer = &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("%d players wasn't found. Check your input for errors.", missingPlayers),
+					Text: fmt.Sprintf("%d players weren't found. Check your input for errors.", missingPlayers),
 				}
 			}
 		}
@@ -129,12 +131,22 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 			IconURL: guild.IconURL(),
 		}
 		// get player names seperated by commas
-		cArgs := strings.Split(strings.Join(args, " "), ",")
-		for i, p := range cArgs {
-			cArgs[i] = strings.TrimSpace(p)
-		}
-		if settings.Spreadsheet2 != "" && len(cArgs[0]) > 3 {
-			cArgs[0] = cArgs[0][3:]
+		// if there were no additional names provided, use the user's display name
+		var cArgs []string
+		if len(args) == 0 || settings.Spreadsheet2 != "" && len(args) == 1 {
+			if message.Member.Nick != "" {
+				cArgs = []string{message.Member.Nick}
+			} else {
+				cArgs = []string{message.Author.Username}
+			}
+		} else {
+			cArgs = strings.Split(strings.Join(args, " "), ",")
+			for i, p := range cArgs {
+				cArgs[i] = strings.TrimSpace(p)
+			}
+			if settings.Spreadsheet2 != "" && len(cArgs[0]) > 3 {
+				cArgs[0] = cArgs[0][3:]
+			}
 		}
 		var tr string
 		if len(args) > 0 {
@@ -211,7 +223,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 				}
 			} else {
 				embed.Footer = &discordgo.MessageEmbedFooter{
-					Text: fmt.Sprintf("%d players wasn't found. Check your input for errors.", missingPlayers),
+					Text: fmt.Sprintf("%d players weren't found. Check your input for errors.", missingPlayers),
 				}
 			}
 		}

@@ -13,24 +13,16 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// Add command to list of commands
 func init() {
-	cmd := Stats()
-	Commands = append(Commands, cmd)
-	fmt.Printf("loaded command: %s\n", cmd.Name)
-}
-
-// Initialize command
-func Stats() Command {
 	cmd := Command{}
 	cmd.Name = "stats"
 	cmd.Run = runStats
-	return cmd
+	initCommand(cmd)
 }
 
 // Function to run when command is used
 func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic()
+	defer recoverPanic(s, message)
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}
@@ -52,6 +44,10 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		if settings.GameBoards2 != "" {
 			if len(args) > 1 {
 				player = strings.Join(args[1:], " ")
+			} else if message.Member.Nick != "" {
+				player = message.Member.Nick
+			} else {
+				player = message.Author.Username
 			}
 			if tr == "rt" {
 				leaderboard, errMsg = mmr.GetHlData(settings.GameBoards1)
@@ -64,6 +60,10 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		} else {
 			if len(args) > 0 {
 				player = strings.Join(args, " ")
+			} else if message.Member.Nick != "" {
+				player = message.Member.Nick
+			} else {
+				player = message.Author.Username
 			}
 			leaderboard, errMsg = mmr.GetHlData(settings.GameBoards1)
 		}
@@ -172,6 +172,10 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		if settings.Spreadsheet2 != "" {
 			if len(args) > 1 {
 				player = strings.Join(args[1:], " ")
+			} else if message.Member.Nick != "" {
+				player = message.Member.Nick
+			} else {
+				player = message.Author.Username
 			}
 			if tr == "rt" {
 				leaderboard, errMsg = mmr.GetSSData(settings.Spreadsheet1, settings.SheetName)
@@ -184,6 +188,10 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		} else {
 			if len(args) > 0 {
 				player = strings.Join(args, " ")
+			} else if message.Member.Nick != "" {
+				player = message.Member.Nick
+			} else {
+				player = message.Author.Username
 			}
 			leaderboard, errMsg = mmr.GetSSData(settings.Spreadsheet1, settings.SheetName)
 		}
