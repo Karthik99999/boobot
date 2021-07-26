@@ -22,7 +22,7 @@ func init() {
 
 // Function to run when command is used
 func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []string, settings structs.GuildSettings) {
-	defer recoverPanic(s, message)
+	defer recoverPanic(s)
 	if strings.ToLower(settings.DisableMMR) == "true" {
 		return
 	}

@@ -38,7 +38,7 @@ func initCommand(cmd Command) {
 }
 
 // Prevent bot from crashing from a panic
-func recoverPanic(s *discordgo.Session, message *discordgo.MessageCreate) {
+func recoverPanic(s *discordgo.Session) {
 	if r := recover(); r != nil {
 		fmt.Println("RECOVERED PANIC:", r)
 		dmChannel, err := s.UserChannelCreate("397514708736802816")
