@@ -125,30 +125,29 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		tierColor, _ := strconv.ParseInt(strings.ReplaceAll(getTier(math.Floor(hlPlayer.Rating)).Color, "#", ""), 16, 64)
 		embedColor := strconv.FormatInt(tierColor, 10)
 		embed.Color, _ = strconv.Atoi(embedColor)
-		embed.Description = fmt.Sprintf("[%s](%s)", hlPlayer.Name, leaderboard.Data.Team.Url+"/player/"+hlPlayer.Name)
-
-		addStatField("Rank", "#"+strconv.Itoa(hlPlayer.Ranking+1))
-		addStatField("Tier", getTier(math.Floor(hlPlayer.Rating)).Name)
-		addStatField("Matches", strconv.Itoa(hlPlayer.PlayedMatchCount))
-		addStatField("Rating", strconv.Itoa(int(math.Floor(hlPlayer.Rating))))
-		addStatField("Max Rating", strconv.Itoa(int(math.Floor(hlPlayer.MaxRating))))
-		addStatField("Min Rating", strconv.Itoa(int(math.Floor(hlPlayer.MinRating))))
-		addStatField("Wins", strconv.Itoa(hlPlayer.Wins))
-		addStatField("Losses", strconv.Itoa(hlPlayer.Losses))
-		addStatField("Win Ratio", fmt.Sprintf("%.1f%%", (float64(hlPlayer.Wins)/float64(hlPlayer.PlayedMatchCount))*100))
-		addStatField("Max Rating Gain", fmt.Sprintf("%+d", hlPlayer.MaxRatingGain))
-		addStatField("Max Rating Loss", strconv.Itoa(hlPlayer.MaxRatingLoss))
-		addStatField("Max Points", strconv.Itoa(hlPlayer.MaxPointsGain))
-		addStatField("Avg Points", fmt.Sprintf("%.1f", (float64(hlPlayer.Points)/float64(hlPlayer.PlayedMatchCount))))
-		addStatField("Best Rank", "#"+strconv.Itoa(hlPlayer.MinRanking+1))
-		addStatField("Worst Rank", "#"+strconv.Itoa(hlPlayer.MaxRanking+1))
-
-		if embed.Description == "[](https://gb.hlorenzi.com/reg/gWsHAI/player/)" {
-			embed.Fields = nil
+		if hlPlayer.Name == "" {
 			embed.Footer = &discordgo.MessageEmbedFooter{
 				Text: "The specified player wasn't found. Check your input for errors.",
 			}
+		} else {
+			embed.Description = fmt.Sprintf("[%s](%s)", hlPlayer.Name, leaderboard.Data.Team.Url+"/player/"+strings.ReplaceAll(hlPlayer.Name, " ", "%20"))
+			addStatField("Rank", "#"+strconv.Itoa(hlPlayer.Ranking+1))
+			addStatField("Tier", getTier(math.Floor(hlPlayer.Rating)).Name)
+			addStatField("Matches", strconv.Itoa(hlPlayer.PlayedMatchCount))
+			addStatField("Rating", strconv.Itoa(int(math.Floor(hlPlayer.Rating))))
+			addStatField("Max Rating", strconv.Itoa(int(math.Floor(hlPlayer.MaxRating))))
+			addStatField("Min Rating", strconv.Itoa(int(math.Floor(hlPlayer.MinRating))))
+			addStatField("Wins", strconv.Itoa(hlPlayer.Wins))
+			addStatField("Losses", strconv.Itoa(hlPlayer.Losses))
+			addStatField("Win Ratio", fmt.Sprintf("%.1f%%", (float64(hlPlayer.Wins)/float64(hlPlayer.PlayedMatchCount))*100))
+			addStatField("Max Rating Gain", fmt.Sprintf("%+d", hlPlayer.MaxRatingGain))
+			addStatField("Max Rating Loss", strconv.Itoa(hlPlayer.MaxRatingLoss))
+			addStatField("Max Points", strconv.Itoa(hlPlayer.MaxPointsGain))
+			addStatField("Avg Points", fmt.Sprintf("%.1f", (float64(hlPlayer.Points)/float64(hlPlayer.PlayedMatchCount))))
+			addStatField("Best Rank", "#"+strconv.Itoa(hlPlayer.MinRanking+1))
+			addStatField("Worst Rank", "#"+strconv.Itoa(hlPlayer.MaxRanking+1))
 		}
+
 		s.ChannelMessageSendEmbed(message.ChannelID, embed)
 	} else {
 		if settings.Spreadsheet1 == "" || settings.SheetName == "" || settings.PlayerIndex == "" || settings.StatIndexes == "" {

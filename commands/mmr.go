@@ -87,7 +87,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 					if strings.ToLower(hlPlayer.Name) == strings.ToLower(player) {
 						field := &discordgo.MessageEmbedField{
 							Name:   hlPlayer.Name,
-							Value:  fmt.Sprintf("[%s](%s)", strconv.Itoa(int(math.Floor(hlPlayer.Rating))), leaderboard.Data.Team.Url+"/player/"+hlPlayer.Name),
+							Value:  fmt.Sprintf("[%s](%s)", strconv.Itoa(int(math.Floor(hlPlayer.Rating))), leaderboard.Data.Team.Url+"/player/"+strings.ReplaceAll(hlPlayer.Name, " ", "%20")),
 							Inline: true,
 						}
 						embed.Fields = append(embed.Fields, field)
@@ -97,7 +97,7 @@ func runMMR(s *discordgo.Session, message *discordgo.MessageCreate, args []strin
 				if strings.ToLower(hlPlayer.Name) == strings.ToLower(message.Member.Nick) || strings.ToLower(hlPlayer.Name) == strings.ToLower(message.Author.Username) {
 					field := &discordgo.MessageEmbedField{
 						Name:   hlPlayer.Name,
-						Value:  fmt.Sprintf("[%s](%s)", strconv.Itoa(int(math.Floor(hlPlayer.Rating))), leaderboard.Data.Team.Url+"/player/"+hlPlayer.Name),
+						Value:  fmt.Sprintf("[%s](%s)", strconv.Itoa(int(math.Floor(hlPlayer.Rating))), leaderboard.Data.Team.Url+"/player/"+strings.ReplaceAll(hlPlayer.Name, " ", "%20")),
 						Inline: true,
 					}
 					embed.Fields = append(embed.Fields, field)
