@@ -201,15 +201,15 @@ func runStats(s *discordgo.Session, message *discordgo.MessageCreate, args []str
 		}
 		// Convert indexes from settings to ints
 		reg := regexp.MustCompile(`\s`)
-		playerIndex, _ := strconv.Atoi(settings.PlayerIndex)
+		playerIndex, err := strconv.Atoi(settings.PlayerIndex)
+		if err != nil || playerIndex >= len(leaderboard[0]) {
+			s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
+			return
+		}
 		statIndexes := strings.Split(reg.ReplaceAllString(settings.StatIndexes, ""), ",")
 		for _, index := range statIndexes {
 			i, err := strconv.Atoi(index)
-			if err != nil {
-				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
-				return
-			}
-			if playerIndex >= len(leaderboard[0]) || i >= len(leaderboard[0]) {
+			if err != nil || i >= len(leaderboard[0]) {
 				s.ChannelMessageSend(message.ChannelID, "There was an error retrieving data from the leaderboard. Make sure the indexes for the player and stat columns are correct in the guild settings using the `set` command.")
 				return
 			}
