@@ -2,13 +2,36 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
 	"math/rand"
 	"reflect"
+	"runtime/debug"
 	"strconv"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
+
+// Prevent bot from crashing from a panic
+func RecoverPanic(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Flags:   discordgo.MessageFlagsEphemeral,
+			Content: "The command crashed while running. Please try again in a moment.",
+		},
+	})
+	if r := recover(); r != nil {
+		fmt.Println("RECOVERED PANIC:", r)
+		dmChannel, err := s.UserChannelCreate("397514708736802816")
+		if err != nil {
+			fmt.Println("Error sending panic stack trace DM:\n", err)
+		} else {
+			msg := fmt.Sprintf("RECOVERED PANIC:\n```%v\n%s```", r, string(debug.Stack()))
+			s.ChannelMessageSend(dmChannel.ID, msg)
+		}
+	}
+}
 
 // Contains checks if the slice/array contains the value
 func Contains(slice, val interface{}) bool {
@@ -64,7 +87,23 @@ func Nth(i int) string {
 	return strconv.Itoa(i) + "th"
 }
 
-func MemberHasPermission(s *discordgo.Session, guildID string, userID string, permission int) (bool, error) {
+func GetArgs(options []*discordgo.ApplicationCommandInteractionDataOption) []string {
+	args := []string{}
+	for _, option := range options {
+		args = append(args, option.StringValue())
+	}
+	return args
+}
+
+func MemberHasPermission(s *discordgo.Session, guildID string, userID string, permission int64) (bool, error) {
+	// Guild owner has every permission
+	guild, err := s.Guild(guildID)
+	if err != nil {
+		if guild.OwnerID == userID {
+			return true, nil
+		}
+	}
+
 	member, err := s.State.Member(guildID, userID)
 	if err != nil {
 		if member, err = s.GuildMember(guildID, userID); err != nil {

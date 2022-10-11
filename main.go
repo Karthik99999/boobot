@@ -7,14 +7,43 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"boobot/commands"
-	"boobot/structs"
+	"boobot/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
+
+func ready(s *discordgo.Session, event *discordgo.Ready) {
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+	fmt.Println("logged in as user " + s.State.User.String())
+}
+
+func guildCreate(s *discordgo.Session, guild *discordgo.GuildCreate) {
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+}
+
+func guildDelete(s *discordgo.Session, guild *discordgo.GuildDelete) {
+	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
+	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+}
+
+func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if i.Type != discordgo.InteractionApplicationCommand {
+		return
+	}
+
+	// If a command handler crashes, don't kill the bot
+	defer utils.RecoverPanic(s, i)
+
+	data := i.ApplicationCommandData()
+	if h, ok := commands.CommandHandlers[data.Name]; ok {
+		h(s, i)
+	}
+}
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -29,101 +58,46 @@ func main() {
 		fmt.Println("A token wasn't provided! Use the -token flag to set one.")
 		return
 	}
-	bot, err := discordgo.New("Bot " + *token)
+	s, err := discordgo.New("Bot " + *token)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// register events
-	bot.AddHandler(ready)
-	bot.AddHandler(guildCreate)
-	bot.AddHandler(guildDelete)
-	bot.AddHandler(messageCreate)
+	s.AddHandler(ready)
+	s.AddHandler(guildCreate)
+	s.AddHandler(guildDelete)
+	s.AddHandler(commandHandler)
 
-	bot.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAllWithoutPrivileged)
+	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged
 
-	err = bot.Open()
-
+	err = s.Open()
 	if err != nil {
-		fmt.Println("Error opening Discord session: ", err)
+		log.Println("Error opening Discord session: ", err)
 	}
-	// Wait here until CTRL-C or other term signal is received.
+
+	fmt.Println("Adding commands...")
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands.Commands))
+	for i, v := range commands.Commands {
+		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
+		if err != nil {
+			log.Printf("Cannot create '%v' command: %v", v.Name, err)
+		}
+		registeredCommands[i] = cmd
+	}
+
+	defer s.Close()
+
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
-	// Cleanly close down the Discord session.
-	bot.Close()
-}
 
-func ready(s *discordgo.Session, event *discordgo.Ready) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	usd := discordgo.UpdateStatusData{
-		Game: &discordgo.Game{
-			Name: "boobot.glitch.me | " + guildCount,
-			Type: discordgo.GameTypeWatching,
-		},
-		Status: "dnd",
-	}
-	s.UpdateStatusComplex(usd)
-	fmt.Println("logged in as user " + s.State.User.String())
-}
-
-func guildCreate(s *discordgo.Session, guild *discordgo.GuildCreate) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	usd := discordgo.UpdateStatusData{
-		Game: &discordgo.Game{
-			Name: "boobot.glitch.me | " + guildCount,
-			Type: discordgo.GameTypeWatching,
-		},
-		Status: "dnd",
-	}
-	s.UpdateStatusComplex(usd)
-}
-
-func guildDelete(s *discordgo.Session, guild *discordgo.GuildDelete) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	usd := discordgo.UpdateStatusData{
-		Game: &discordgo.Game{
-			Name: "boobot.glitch.me | " + guildCount,
-			Type: discordgo.GameTypeWatching,
-		},
-		Status: "dnd",
-	}
-	s.UpdateStatusComplex(usd)
-}
-
-func messageCreate(s *discordgo.Session, message *discordgo.MessageCreate) {
-	// Don't reply to bots or read DMs
-	if message.Author.Bot || message.GuildID == "" {
-		return
-	}
-
-	guildSettings := structs.GetSettings(message.GuildID)
-	prefix := guildSettings.Prefix
-
-	// Don't execute commands if they don't start with the prefix
-	if strings.TrimPrefix(message.Content, prefix) == message.Content {
-		return
-	}
-
-	args := strings.Fields(strings.TrimPrefix(message.Content, prefix))
-	if len(args) <= 0 {
-		return
-	}
-	command := strings.ToLower(args[0])
-	args = args[1:]
-
-	if alias, exists := commands.Aliases[command]; exists {
-		command = alias
-	}
-	if c, exists := commands.Commands[command]; exists {
-		go c.Run(s, message, args, guildSettings)
-		guild, err := s.Guild(message.GuildID)
+	fmt.Println("Removing commands...")
+	for _, v := range registeredCommands {
+		err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
 		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Printf("%s (%s) used %s command in %s (%s)\n", message.Author.Username, message.Author.ID, command, guild.Name, message.GuildID)
+			log.Printf("Cannot delete '%v' command: %v", v.Name, err)
 		}
 	}
 }

@@ -66,7 +66,11 @@ func GetHlData(id string) (*structs.HlorenziBoard, string) {
 		log.Println(err)
 		return nil, "An error occured during the request. Please try again in a moment."
 	}
-	board.Data.Team.Url = "https://gb.hlorenzi.com/reg/" + id
 
+	if board.Data.Team.Kind != "lounge" {
+		return nil, "The game boards ID wasn't found, or it was not for a lounge. Change it in the guild settings."
+	}
+
+	board.Data.Team.Url = "https://gb.hlorenzi.com/reg/" + id
 	return board, ""
 }

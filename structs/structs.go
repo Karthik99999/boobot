@@ -11,20 +11,16 @@ import (
 )
 
 type GuildSettings struct {
-	guildID       string
-	Prefix        string
-	DisableChoose string
-	DisableMMR    string
-	DisableFC     string
-	GameBoards1   string
-	GameBoards2   string
-	Spreadsheet1  string
-	Spreadsheet2  string
-	SheetName     string
-	RatingName    string
-	PlayerIndex   string
-	RatingIndex   string
-	StatIndexes   string
+	guildID      string
+	GameBoards1  string
+	GameBoards2  string
+	Spreadsheet1 string
+	Spreadsheet2 string
+	SheetName    string
+	RatingName   string
+	PlayerIndex  string
+	RatingIndex  string
+	StatIndexes  string
 }
 
 func GetSettings(guildID string) GuildSettings {
@@ -46,18 +42,6 @@ func GetSettings(guildID string) GuildSettings {
 // Set default settings. Should be called after initializing settings variable
 func (gs *GuildSettings) Default(guildID string) {
 	gs.guildID = guildID
-	if gs.Prefix == "" {
-		gs.Prefix = "^"
-	}
-	if gs.DisableChoose == "" {
-		gs.DisableChoose = "false"
-	}
-	if gs.DisableMMR == "" {
-		gs.DisableMMR = "false"
-	}
-	if gs.DisableFC == "" {
-		gs.DisableFC = "false"
-	}
 	if gs.SheetName == "" {
 		gs.SheetName = "Leaderboard"
 	}
