@@ -1,6 +1,6 @@
 # Running the bot
 
-This bot uses GO version 1.14.
+This bot uses GO version 1.19
 
 To run the bot, run the following commands
 
