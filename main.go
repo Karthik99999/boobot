@@ -16,19 +16,16 @@ import (
 )
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+	s.UpdateWatchStatus(0, fmt.Sprintf("%d servers", len(s.State.Guilds)))
 	fmt.Println("logged in as user " + s.State.User.String())
 }
 
 func guildCreate(s *discordgo.Session, guild *discordgo.GuildCreate) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+	s.UpdateWatchStatus(0, fmt.Sprintf("%d servers", len(s.State.Guilds)))
 }
 
 func guildDelete(s *discordgo.Session, guild *discordgo.GuildDelete) {
-	guildCount := fmt.Sprintf("%d servers", len(s.State.Guilds))
-	s.UpdateGameStatus(0, "boobot.glitch.me | "+guildCount)
+	s.UpdateWatchStatus(0, fmt.Sprintf("%d servers", len(s.State.Guilds)))
 }
 
 func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
